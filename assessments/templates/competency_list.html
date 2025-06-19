@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Select Competency for {{ job_title.title }}{% endblock %}
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Select Competency for {{ job_title.title }}</h1>
+    {% if competencies %}
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <p class="text-gray-600">Please select the competencies you want to include in the interview:</p>
+            <div class="space-y-4">
+            {% for competency in competencies %}
+                <div class="border-b border-gray-200 pb-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="competencies" value="{{ competency.id }}" class="form-checkbox h-5 w-5 text-blue-600">
+                        <span class="ml-2 text-lg font-semibold text-gray-700">{{ competency.name }}</span>
+                    </label>
+                    {% if competency.description %}
+                        <p class="text-gray-600 mt-2">{{ competency.description }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">Start Interview</button>
+        </form>
+    {% else %}
+        <p class="text-gray-600">No competencies available for this job title.</p>
+    {% endif %}
+</div>
+{% endblock %}

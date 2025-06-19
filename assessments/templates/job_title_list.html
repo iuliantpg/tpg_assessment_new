@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Select Job Title in {{ department.name }}{% endblock %}
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Select a Job Title in {{ department.name }}</h1>
+    {% if job_titles %}
+        <ul class="space-y-4">
+        {% for job_title in job_titles %}
+            <li class="border-b border-gray-200 pb-4">
+                <a href="{% url 'competency_list' job_title_id=job_title.id %}" class="text-blue-600 hover:underline hover:text-blue-800 transition text-lg font-semibold">{{ job_title.title }}</a>
+                {% if job_title.summary %}
+                    <p class="text-gray-700 mt-2"><strong>Summary:</strong> {{ job_title.summary }}</p>
+                {% endif %}
+                {% if job_title.history %}
+                    <p class="text-gray-600 mt-2"><strong>History:</strong> {{ job_title.history }}</p>
+                {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-600">No job titles available for this department.</p>
+    {% endif %}
+</div>
+{% endblock %}

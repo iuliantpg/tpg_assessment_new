@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Select Department{% endblock %}
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Select a Department</h1>
+    {% if departments %}
+        <ul class="space-y-2">
+        {% for department in departments %}
+            <li><a href="{% url 'job_title_list' department_id=department.id %}" class="text-blue-600 hover:underline hover:text-blue-800 transition">{{ department.name }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-600">No departments available. Please add some in the admin panel.</p>
+    {% endif %}
+</div>
+{% endblock %}

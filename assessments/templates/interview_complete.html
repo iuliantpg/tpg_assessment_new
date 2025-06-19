@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Interview Complete{% endblock %}
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6 text-center">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Interview Completed for {{ session.competency.name }}</h1>
+    <p class="text-gray-600 mb-6">Thank you for completing the interview!</p>
+    <a href="{% url 'feedback_report' session_id=session.id %}" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition inline-block mb-4">View Feedback Report (For Interviewer)</a>
+    <br>
+    {% if next_competency %}
+        <p class="text-gray-600 mb-4">You have more competencies to assess.</p>
+        <a href="{% url 'start_interview' competency_id=next_competency.id %}" class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition">Start Next Competency: {{ next_competency.name }}</a>
+    {% else %}
+        <p class="text-gray-600 mb-4">All selected competencies have been completed.</p>
+        <a href="{% url 'department_list' %}" class="text-blue-600 hover:underline hover:text-blue-800 transition">Back to Departments</a>
+    {% endif %}
+</div>
+{% endblock %}

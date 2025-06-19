@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Interview - Question{% endblock %}
+{% block content %}
+<div class="bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Question for {{ session.competency.name }}</h1>
+    <h3 class="text-lg font-semibold text-gray-700 mb-4">{{ question.text }} <span class="text-gray-500">(Level {{ question.sophistication_level }})</span></h3>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div class="flex flex-col md:flex-row gap-6">
+            <div class="flex-1">
+                <textarea name="answer" 
+                          id="answer_{{ question.id }}"
+                          data-position="{{ session.competency.job_title.title }}" 
+                          data-competency="{{ session.competency.name }}" 
+                          data-question="{{ question.text }}" 
+                          data-guidance="{{ question.interpretation_guidance }}" 
+                          data-question-id="{{ question.id }}"
+                          rows="4" class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" required placeholder="Type your answer here..."></textarea>
+                {% if question.is_scope_question %}
+                    <div class="mt-4 space-y-2">
+                        {% for scope in session.competency.scope_set.all %}
+                            <label class="flex items-center">
+                                <input type="radio" name="scope_choice" value="{{ scope.id }}" class="form-radio text-blue-600" required>
+                                <span class="ml-2 text-gray-700">{{ scope.name }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="mt-4 space-x-6">
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="is_yes" value="Yes" class="form-radio text-blue-600" required>
+                            <span class="ml-2 text-gray-700">Yes</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                            <input type="radio" name="is_yes" value="No" class="form-radio text-blue-600">
+                            <span class="ml-2 text-gray-700">No</span>
+                        </label>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="flex-1 bg-gray-50 p-4 rounded-md shadow-inner">
+                <strong class="text-gray-700 block mb-2">Interpretation Guidance:</strong>
+                <p class="text-gray-600">{{ question.interpretation_guidance|default:"No guidance provided." }}</p>
+            </div>
+        </div>
+        <div id="feedback" class="mt-4 p-4 bg-gray-100 rounded-md">
+            <h4 class="text-gray-800 font-semibold mb-2">Live Feedback:</h4>
+            <p id="feedback-text" class="text-gray-600">Start typing to get feedback...</p>
+        </div>
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition mt-4">Next</button>
+    </form>
+</div>
+<script>
+    document.querySelectorAll('textarea[id^="answer_"]').forEach(function(textarea) {
+        let timeout;
+        textarea.addEventListener('input', function() {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+                const answer = textarea.value;
+                const position = textarea.dataset.position;
+                const competency = textarea.dataset.competency;
+                const question = textarea.dataset.question;
+                const guidance = textarea.dataset.guidance;
+                const questionId = textarea.dataset.questionId;
+                const feedbackElement = document.getElementById('feedback-text');
+                if (answer.trim() !== '') {
+                    feedbackElement.innerText = 'Loading feedback...';
+                    fetch(`/live_feedback/?answer=${encodeURIComponent(answer)}&position=${encodeURIComponent(position)}&competency=${encodeURIComponent(competency)}&question=${encodeURIComponent(question)}&guidance=${encodeURIComponent(guidance)}&question_id=${questionId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            feedbackElement.innerText = data.feedback;
+                        })
+                        .catch(error => {
+                            feedbackElement.innerText = 'Error fetching feedback: ' + error.message;
+                        });
+                } else {
+                    feedbackElement.innerText = 'Start typing to get feedback...';
+                }
+            }, 500);
+        });
+    });
+</script>
+{% endblock %}
